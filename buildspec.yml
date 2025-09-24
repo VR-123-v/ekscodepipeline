@@ -6,12 +6,17 @@ env:
     IMAGE_TAG: latest
 
 phases:
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
-      - echo Logging in to Docker Hub...
-      - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
+ pre_build:
+  commands:
+    - echo Logging in to Amazon ECR...
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
+    - echo Logging in to Docker Hub...
+    - |
+      if [ -z "$DOCKER_HUB_USERNAME" ] || [ -z "$DOCKER_HUB_PASSWORD" ]; then
+        echo "ERROR: Docker Hub credentials not set!"
+        exit 1
+      fi
+    - echo $DOCKER_HUB_PASSWORD | docker login --username $DOCKER_HUB_USERNAME --password-stdin
 
   build:
     commands:
