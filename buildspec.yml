@@ -21,7 +21,10 @@ phases:
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions for CodePipeline...
       - printf '[{"name":"node-app","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - echo Build completed on `date`
+      - echo Deploying to EKS cluster...
+      - aws eks update-kubeconfig --name eks-node-app --region us-east-1
+      - kubectl apply -f k8s-manifest.yaml
+      - echo Build and deployment completed on `date`
 
 artifacts:
   files:
